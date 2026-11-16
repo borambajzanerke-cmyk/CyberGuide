@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberGuide — Электронный справочник по компьютерной безопасности</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- СТАРТОВОЕ МОДАЛЬНОЕ ОКНО -->
+    <div id="welcome-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-icon">🛡️</div>
+            <h2>Добро пожаловать / Қош келдіңіз</h2>
+            <p class="modal-subtitle">Выберите язык и режим доступа для продолжения</p>
+
+            <div class="form-group">
+                <label>Выберите язык / Тілді таңдаңыз:</label>
+                <div class="grid-2">
+                    <button type="button" id="lang-btn-ru" class="btn active-cyan">Русский</button>
+                    <button type="button" id="lang-btn-kz" class="btn btn-dark">Қазақша</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label id="mode-label">Режим входа:</label>
+                <div class="grid-2">
+                    <button type="button" id="btn-login-mode" class="btn btn-dark">Войти (С аккаунтом)</button>
+                    <button type="button" id="btn-guest-mode" class="btn active-cyan">Как гость</button>
+                </div>
+            </div>
+
+            <div id="auth-form" class="form-group hidden">
+                <label id="auth-title">Войти в аккаунт</label>
+                <input type="email" id="username-input" placeholder="Email (например, name@example.com)" class="text-input" autocomplete="email" maxlength="254">
+                <div class="password-field" style="margin-top:10px;">
+                    <input type="password" id="password-input" placeholder="Пароль" class="text-input" autocomplete="current-password" maxlength="128">
+                    <button type="button" id="toggle-password" class="password-toggle" aria-label="Показать пароль" title="Показать пароль">👁</button>
+                </div>
+                <p id="auth-help" class="auth-help">Новый пользователь? Введи email и придумай пароль, затем нажми «Зарегистрироваться». Если аккаунт уже есть — переключись на вход.</p>
+                <p id="auth-message" class="auth-message" role="status"></p>
+                <div class="grid-2" style="margin-top:10px;">
+                    <button type="button" id="auth-submit-btn" class="btn btn-gradient">Войти</button>
+                    <button type="button" id="auth-switch-btn" class="btn btn-dark">Регистрация</button>
+                </div>
+            </div>
+
+            <button type="button" id="start-app-btn" class="btn btn-gradient">Начать обучение / Бастау</button>        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО СТАТЕЙ -->
+    <div id="detail-modal" class="modal-overlay hidden">
+        <div class="modal-box detail-modal-box">
+            <button class="close-modal-btn" onclick="closeDetailModal()">&times;</button>
+            <div id="detail-modal-content"></div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ВИДЕО -->
+    <div id="video-modal" class="modal-overlay hidden">
+        <div class="modal-box video-modal-box">
+            <button class="close-modal-btn" onclick="closeVideoModal()">&times;</button>
+            <div id="video-container" class="video-embed-wrapper"></div>
+        </div>
+    </div>
+
+    <!-- ШАПКА САЙТА -->
+    <header class="header">
+        <div class="container nav-container">
+            <div class="logo-block">
+                <div class="logo-shield">🛡️</div>
+                <span class="logo-text">CyberGuide</span>
+            </div>
+            <nav class="nav-links">
+                <a href="#hero" data-translate="nav-home">Главная</a>
+                <a href="#articles" data-translate="nav-base">База знаний</a>
+                <a href="#tools" data-translate="nav-tools">Инструменты</a>
+                <a href="#quiz" data-translate="nav-test">Тест</a>
+                <a href="#game" data-translate="nav-game">Игра</a>
+                <a href="#about" data-translate="nav-videos">О проекте</a>
+            </nav>
+            <div class="nav-actions">
+                <span id="user-status-display" class="user-pill">жанерке</span>
+                <button id="lang-toggle" class="lang-btn"><span id="current-lang">RU</span> ▾</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- БАННЕР -->
+        <section id="hero" class="hero-block">
+            <div class="container hero-container">
+                <div class="hero-left">
+                    <h1 data-translate="hero-title">ЭЛЕКТРОННЫЙ СПРАВОЧНИК ПО КОМПЬЮТЕРНОЙ БЕЗОПАСНОСТИ</h1>
+                    <p data-translate="hero-desc">Проверенные знания, полезные инструменты и практические советы для вашей цифровой безопасности.</p>
+                    <div class="hero-btns">
+                        <a href="#articles" class="btn btn-cyan" data-translate="btn-to-articles">Перейти к статьям →</a>
+                        <a href="#quiz" class="btn btn-outline" data-translate="btn-pass-test">Пройти тест</a>
+                    </div>
+                </div>
+                <div class="hero-right">
+                    <div class="hacker-card">
+                        <div class="shield-overlay">🛡️</div>
+                        <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80" alt="Cyber Security">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4 КАРТОЧКИ -->
+            <div class="container quick-cards-grid">
+                <a href="#articles" class="q-card">
+                    <div class="q-icon">📖</div>
+                    <div>
+                        <h4 data-translate="qc-1-title">База знаний</h4>
+                        <p data-translate="qc-1-desc">Статьи о киберугрозах и способах защиты</p>
+                    </div>
+                    <span class="q-arrow">→</span>
+                </a>
+                <a href="#tools" class="q-card">
+                    <div class="q-icon">⚙️</div>
+                    <div>
+                        <h4 data-translate="qc-2-title">Инструменты</h4>
+                        <p data-translate="qc-2-desc">Генератор паролей, полезные сервисы</p>
+                    </div>
+                    <span class="q-arrow">→</span>
+                </a>
+                <a href="#quiz" class="q-card">
+                    <div class="q-icon">☑️</div>
+                    <div>
+                        <h4 data-translate="qc-3-title">Тесты</h4>
+                        <p data-translate="qc-3-desc">Проверьте свои знания о безопасности</p>
+                    </div>
+                    <span class="q-arrow">→</span>
+                </a>
+                <a href="#game" class="q-card">
+                    <div class="q-icon">🎮</div>
+                    <div>
+                        <h4 data-translate="qc-4-title">Интерактивная игра</h4>
+                        <p data-translate="qc-4-desc">Научитесь распознавать угрозы</p>
+                    </div>
+                    <span class="q-arrow">→</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- БАЗА ЗНАНИЙ (6 СТАТЕЙ) -->
+        <section id="articles" class="container section-padding">
+            <div class="section-head">
+                <h2 data-translate="base-title">База знаний</h2>
+                <p data-translate="base-sub">Статьи, советы и материалы о компьютерной безопасности</p>
+            </div>
+
+            <div class="search-bar-wrap">
+                <input type="text" id="article-search" placeholder="Поиск по статьям..." class="search-input" data-translate-holder="search-ph">
+            </div>
+
+            <div class="category-tags">
+                <button class="tag-btn active" onclick="filterArticles('all', this)" data-translate="tag-all">Все</button>
+                <button class="tag-btn" onclick="filterArticles('viruses', this)" data-translate="tag-viruses">Вирусы</button>
+                <button class="tag-btn" onclick="filterArticles('scam', this)" data-translate="tag-scam">Мошенничество</button>
+                <button class="tag-btn" onclick="filterArticles('data', this)" data-translate="tag-data">Защита данных</button>
+            </div>
+
+            <div class="grid-3" id="articles-grid">
+                <div class="article-card" data-category="scam" onclick="openDetail('phishing')">
+                    <div class="art-img-box"><img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=600&q=80" alt="Phishing"></div>
+                    <div class="art-content">
+                        <h3 data-translate="art-1-title">Что такое фишинг?</h3>
+                        <p data-translate="art-1-desc">Как распознать поддельные письма и защитить свои данные.</p>
+                        <div class="art-footer"><span class="badge-blue" data-translate="tag-scam">Мошенничество</span><span class="arrow-btn">→</span></div>
+                    </div>
+                </div>
+
+                <div class="article-card" data-category="viruses" onclick="openDetail('malware')">
+                    <div class="art-img-box"><img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=600&q=80" alt="Viruses"></div>
+                    <div class="art-content">
+                        <h3 data-translate="art-2-title">Компьютерные вирусы</h3>
+                        <p data-translate="art-2-desc">Виды вирусов и способы защиты от заражения.</p>
+                        <div class="art-footer"><span class="badge-blue" data-translate="tag-viruses">Вирусы</span><span class="arrow-btn">→</span></div>
+                    </div>
+                </div>
+
+                <div class="article-card" data-category="data" onclick="openDetail('passwords')">
+                    <div class="art-img-box"><img src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7?auto=format&fit=crop&w=600&q=80" alt="Passwords"></div>
+                    <div class="art-content">
+                        <h3 data-translate="art-3-title">Надёжные пароли</h3>
+                        <p data-translate="art-3-desc">Как создать безопасный пароль и где его хранить.</p>
+                        <div class="art-footer"><span class="badge-blue" data-translate="tag-data">Защита данных</span><span class="arrow-btn">→</span></div>
+                    </div>
+                </div>
+
+                <div class="article-card" data-category="data" onclick="openDetail('fa2')">
+                    <div class="art-img-box"><img src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?auto=format&fit=crop&w=600&q=80" alt="2FA"></div>
+                    <div class="art-content">
+                        <h3 data-translate="art-4-title">Двухфакторная аутентификация (2FA)</h3>
+                        <p data-translate="art-4-desc">Зачем нужна двухэтапная проверка и как её включить.</p>
+                        <div class="art-footer"><span class="badge-blue" data-translate="tag-data">Защита данных</span><span class="arrow-btn">→</span></div>
+                    </div>
+                </div>
+
+                <div class="article-card" data-category="scam" onclick="openDetail('social')">
+                    <div class="art-img-box"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80" alt="Social Engineering"></div>
+                    <div class="art-content">
+                        <h3 data-translate="art-5-title">Социальная инженерия</h3>
+                        <p data-translate="art-5-desc">Как мошенники манипулируют доверием людей в сети.</p>
+                        <div class="art-footer"><span class="badge-blue" data-translate="tag-scam">Мошенничество</span><span class="arrow-btn">→</span></div>
+                    </div>
+                </div>
+
+                <div class="article-card" data-category="viruses" onclick="openDetail('ransomware')">
+                    <div class="art-img-box"><img src="https://images.unsplash.com/photo-1563206767-5b18f218e8de?auto=format&fit=crop&w=600&q=80" alt="Ransomware"></div>
+                    <div class="art-content">
+                        <h3 data-translate="art-6-title">Вирусы-вымогатели</h3>
+                        <p data-translate="art-6-desc">Что делать, если файлы на компьютере зашифрованы.</p>
+                        <div class="art-footer"><span class="badge-blue" data-translate="tag-viruses">Вирусы</span><span class="arrow-btn">→</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ИНСТРУМЕНТЫ -->
+        <section id="tools" class="container section-padding">
+            <div class="section-head">
+                <h2 data-translate="tools-title">Инструменты</h2>
+                <p data-translate="tools-sub">Полезные сервисы для вашей безопасности</p>
+            </div>
+
+            <div class="tools-tab-menu">
+                <button class="tool-tab active" onclick="switchToolTab(0)" data-translate="tab-gen">Генератор паролей</button>
+                <button class="tool-tab" onclick="switchToolTab(1)" data-translate="tab-check">Проверка пароля</button>
+                <button class="tool-tab" onclick="switchToolTab(2)" data-translate="tab-links">Полезные ссылки</button>
+            </div>
+
+            <div id="tool-content-0" class="tools-card-box">
+                <div class="tools-left">
+                    <h3 data-translate="gen-heading">Генератор надёжных паролей</h3>
+                    <div class="checkbox-options">
+                        <label><input type="checkbox" id="chk-upper" checked> <span data-translate="opt-upper">Буквы (A-Z)</span></label>
+                        <label><input type="checkbox" id="chk-lower" checked> <span data-translate="opt-lower">Буквы (a-z)</span></label>
+                        <label><input type="checkbox" id="chk-num" checked> <span data-translate="opt-num">Цифры (0-9)</span></label>
+                        <label><input type="checkbox" id="chk-sym" checked> <span data-translate="opt-sym">Символы (!@#$)</span></label>
+                    </div>
+                    <div class="range-wrap">
+                        <div class="range-info"><span data-translate="pass-len-lbl">Длина пароля:</span><span id="len-num" class="cyan-num">12</span></div>
+                        <input type="range" id="pass-range" min="6" max="32" value="12">
+                    </div>
+                    <div class="out-row">
+                        <input type="text" id="pass-out" readonly value="x7QpLk9mG2vL">
+                        <button id="btn-copy-pass" class="icon-btn">📋</button>
+                        <button id="btn-gen-pass" class="btn btn-cyan" data-translate="btn-gen-act">Сгенерировать</button>
+                    </div>
+                </div>
+                <div class="tools-right"><div class="shield-badge-box"><div class="big-shield">🛡️</div></div></div>
+            </div>
+
+            <div id="tool-content-1" class="tools-card-box hidden">
+                <div class="tools-left" style="width:100%;">
+                    <h3 data-translate="check-heading">Проверка надежности пароля</h3>
+                    <div class="out-row" style="margin-bottom:15px;">
+                        <input type="text" id="check-input" placeholder="Введите пароль для проверки..." data-translate-holder="check-ph" oninput="checkPasswordStrength()">
+                    </div>
+                    <div id="strength-result" style="font-weight:700; color:var(--cyan-main); font-size:15px;">Введите пароль выше</div>
+                </div>
+            </div>
+
+            <div id="tool-content-2" class="tools-card-box hidden">
+                <div class="tools-left" style="width:100%;">
+                    <h3 data-translate="links-heading">Полезные ресурсы по кибербезопасности</h3>
+                    <ul style="padding-left:20px; color:var(--text-muted); font-size:14px; display:flex; flex-direction:column; gap:10px;">
+                        <li><a href="https://cert.gov.kz" target="_blank" style="color:var(--cyan-main);">KZ-CERT (Служба реагирования на компьютерные инциденты РК)</a></li>
+                        <li><a href="https://www.cyberpolice.kz" target="_blank" style="color:var(--cyan-main);">Cyberpolice.kz (Борьба с интернет-мошенничеством в РК)</a></li>
+                        <li><a href="https://www.kaspersky.com" target="_blank" style="color:var(--cyan-main);">Kaspersky Resource Center (Блог о безопасности)</a></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ТЕСТ И ИГРА -->
+        <div class="container grid-2 section-padding">
+            <section id="quiz" class="box-card">
+                <h3 data-translate="test-title">Тест по кибербезопасности (20 вопросов)</h3>
+                <p data-translate="test-sub" class="sub-text">Проверьте свои знания и узнайте, насколько хорошо вы разбираетесь в цифровой безопасности.</p>
+                <div id="quiz-content"></div>
+            </section>
+
+            <section id="game" class="box-card">
+                <div class="flex-head">
+                    <h3 data-translate="game-title">Интерактивная игра</h3>
+                    <div class="points-pill"><span data-translate="pts-lbl">Очки:</span> <strong id="game-score">0</strong></div>
+                </div>
+                <p data-translate="game-sub" class="sub-text">Распознавайте угрозы и принимайте правильные решения.</p>
+
+                <div class="chat-sim-box">
+                    <p class="chat-msg" id="chat-text" data-translate="chat-msg-default">Вы получили сообщение: «Здравствуйте! Ваша учетная запись будет заблокирована. Перейдите по ссылке для подтверждения: http://secure-login.com»</p>
+                </div>
+
+                <div class="chat-options-list">
+                    <button onclick="playGame(1)" class="chat-opt-btn" data-translate="opt-1">⚪ Перейти по ссылке</button>
+                    <button onclick="playGame(2)" class="chat-opt-btn" data-translate="opt-2">⚪ Проигнорировать сообщение</button>
+                    <button onclick="playGame(3)" class="chat-opt-btn" data-translate="opt-3">⚪ Проверить адрес сайта</button>
+                    <button onclick="playGame(4)" class="chat-opt-btn" data-translate="opt-4">⚪ Сообщить о мошенничестве</button>
+                </div>
+            </section>
+        </div>
+
+        <!-- ВИДЕО -->
+        <section id="videos-sec" class="container section-padding">
+            <div class="section-head">
+                <h2 data-translate="vid-section-title">Обучающие видеоматериалы</h2>
+                <p data-translate="vid-section-sub">Смотрите подробные ролики по цифровой безопасности</p>
+            </div>
+            <div class="grid-2">
+                <div class="article-card" onclick="openVideo('UUcAwvN1Cvg')">
+                    <div class="art-img-box"><img src="https://img.youtube.com/vi/UUcAwvN1Cvg/hqdefault.jpg" alt="Video RU"></div>
+                    <div class="art-content">
+                        <h3 data-translate="vid-ru-title">Основы цифровой гигиены (Русский язык)</h3>
+                        <button class="btn btn-cyan w-100" style="margin-top:12px;" data-translate="btn-watch">Смотреть видео ▶</button>
+                    </div>
+                </div>
+                <div class="article-card" onclick="openVideo('L115YAbItws')">
+                    <div class="art-img-box"><img src="https://img.youtube.com/vi/L115YAbItws/hqdefault.jpg" alt="Video KZ"></div>
+                    <div class="art-content">
+                        <h3 data-translate="vid-kz-title">Киберқауіпсіздік және интернет алаяқтық (Қазақ тілі)</h3>
+                        <button class="btn btn-cyan w-100" style="margin-top:12px;" data-translate="btn-watch-kz">Видеоны қарау ▶</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- О ПРОЕКТЕ (ЖОБА ТУРАЛЫ - КНОПКИ РАБОТАЮТ) -->
+        <section id="about" class="container section-padding">
+            <div class="box-card project-card">
+                <h3 data-translate="proj-title">О проекте</h3>
+                <p data-translate="proj-desc">Электронный справочник по компьютерной безопасности создан в образовательных целях. Проект содержит статьи, полезные инструменты, тесты и интерактивные материалы.</p>
+                <div class="proj-btns">
+                    <button class="btn btn-cyan" onclick="showContactModal()" data-translate="btn-contact">Связаться с нами</button>
+                    <button class="btn btn-outline" onclick="showAuthorsModal()" data-translate="btn-authors">Авторы проекта</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container text-center">
+            <p data-translate="footer-copy">© 2026 CyberGuide — Электронный справочник по компьютерной безопасности.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

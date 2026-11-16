@@ -1,0 +1,13 @@
+{
+  "name": "cyberguide-sql",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CyberGuide — справочник по компьютерной безопасности с SQLite",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "sqlite3": "^5.1.7"
+  }
+}
