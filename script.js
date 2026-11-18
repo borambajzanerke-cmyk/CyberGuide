@@ -465,31 +465,110 @@ function playGame(opt) {
     }
 }
 
+
+let quizResults = [];
+
 function renderQuiz() {
     const wrap = document.getElementById('quiz-content');
-    if (!wrap || typeof dbData === 'undefined' || !dbData.quiz) return;
+    if (!wrap || !dbData || !dbData.quiz) return;
 
     if (quizIndex < dbData.quiz.length) {
         const item = dbData.quiz[quizIndex];
+
         wrap.innerHTML = `
-            <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">${currentLang === 'ru' ? 'Вопрос' : 'Сұрақ'} ${quizIndex + 1} / ${dbData.quiz.length}</p>
-            <h4 style="font-size:15px; color:#fff; margin-bottom:16px;">${item.q[currentLang]}</h4>
-            <div style="display:flex; flex-direction:column; gap:10px;">
+            <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">
+                ${currentLang === 'ru' ? 'Вопрос' : 'Сұрақ'} ${quizIndex + 1} / ${dbData.quiz.length}
+            </p>
+            <h4 style="font-size:15px;color:#fff;margin-bottom:16px;">
+                ${item.q[currentLang]}
+            </h4>
+            <div style="display:flex;flex-direction:column;gap:10px;">
                 ${item.opts[currentLang].map((o, idx) => `
-                    <button class="chat-opt-btn" onclick="checkQuiz(${idx})">⚪ ${o}</button>
+                    <button class="chat-opt-btn" onclick="checkQuiz(${idx})">
+                        ${o}
+                    </button>
                 `).join('')}
             </div>
         `;
-    } else {
-        wrap.innerHTML = `
-            <div style="text-align:center; padding:15px;">
-                <h4 style="color:var(--cyan-main); margin-bottom:10px; font-size:18px;">${currentLang === 'ru' ? 'Тест успешно пройден!' : 'Тест сәтті аяқталды!'}</h4>
-                <p style="font-size:14px; color:var(--text-muted); margin-bottom:16px;">${currentLang === 'ru' ? 'Правильных ответов:' : 'Дұрыс жауаптар:'} ${quizScore} / ${dbData.quiz.length}</p>
-                <button class="btn btn-cyan" onclick="resetQuiz()">${currentLang === 'ru' ? 'Пройти снова' : 'Қайта өту'}</button>
-            </div>
-        `;
+        return;
     }
+
+    const rows = quizResults.map((r, i) => `
+        <tr>
+            <td>${i + 1}</td>
+            <td>${r.question}</td>
+            <td>${r.userAnswer}</td>
+            <td>${r.correctAnswer}</td>
+            <td style="color:${r.correct ? '#65e6a5' : '#ff7777'}">
+                ${r.correct
+                    ? (currentLang === 'ru' ? 'Верно' : 'Дұрыс')
+                    : (currentLang === 'ru' ? 'Неверно' : 'Қате')}
+            </td>
+        </tr>
+    `).join('');
+
+    wrap.innerHTML = `
+        <div style="text-align:center;padding:15px;">
+            <h4 style="color:var(--cyan-main);">
+                ${currentLang === 'ru' ? 'Тест завершён!' : 'Тест аяқталды!'}
+            </h4>
+            <p>
+                ${currentLang === 'ru' ? 'Правильных ответов:' : 'Дұрыс жауаптар:'}
+                ${quizScore} / ${dbData.quiz.length}
+            </p>
+
+            <div style="overflow-x:auto;margin-top:20px;">
+                <table style="width:100%;border-collapse:collapse;color:#fff;text-align:left;">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>${currentLang === 'ru' ? 'Вопрос' : 'Сұрақ'}</th>
+                            <th>${currentLang === 'ru' ? 'Твой ответ' : 'Сенің жауабың'}</th>
+                            <th>${currentLang === 'ru' ? 'Правильный ответ' : 'Дұрыс жауап'}</th>
+                            <th>${currentLang === 'ru' ? 'Результат' : 'Нәтиже'}</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+
+            <button class="btn btn-cyan" onclick="resetQuiz()" style="margin-top:20px;">
+                ${currentLang === 'ru' ? 'Пройти снова' : 'Қайта өту'}
+            </button>
+        </div>
+    `;
 }
+
+function checkQuiz(idx) {
+    if (!dbData || !dbData.quiz) return;
+
+    const item = dbData.quiz[quizIndex];
+    const correct = idx === item.correct;
+
+    if (correct) quizScore++;
+
+    quizResults.push({
+        question: item.q[currentLang],
+        userAnswer: item.opts[currentLang][idx],
+        correctAnswer: item.opts[currentLang][item.correct],
+        correct
+    });
+
+    alert(correct
+        ? (currentLang === 'ru' ? 'Верно!' : 'Дұрыс!')
+        : (currentLang === 'ru' ? 'Неверно.' : 'Қате.'));
+
+    quizIndex++;
+    renderQuiz();
+}
+
+function resetQuiz() {
+    quizIndex = 0;
+    quizScore = 0;
+    quizResults = [];
+    renderQuiz();
+}
+
 
 function checkQuiz(idx) {
     if (typeof dbData === 'undefined' || !dbData.quiz) return;
