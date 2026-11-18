@@ -570,15 +570,26 @@ function resetQuiz() {
 }
 
 
+
 function checkQuiz(idx) {
-    if (typeof dbData === 'undefined' || !dbData.quiz) return;
+    if (!dbData || !dbData.quiz) return;
+
     const item = dbData.quiz[quizIndex];
-    if (idx === item.correct) {
-        quizScore++;
-        alert(currentLang === 'ru' ? 'Верно!' : 'Дұрыс!');
-    } else {
-        alert(currentLang === 'ru' ? 'Неверно.' : 'Қате.');
-    }
+    const correct = idx === item.correct;
+
+    if (correct) quizScore++;
+
+    quizResults.push({
+        question: item.q[currentLang],
+        userAnswer: item.opts[currentLang][idx],
+        correctAnswer: item.opts[currentLang][item.correct],
+        correct: correct
+    });
+
+    alert(correct
+        ? (currentLang === 'ru' ? 'Верно!' : 'Дұрыс!')
+        : (currentLang === 'ru' ? 'Неверно.' : 'Қате.'));
+
     quizIndex++;
     renderQuiz();
 }
@@ -586,5 +597,6 @@ function checkQuiz(idx) {
 function resetQuiz() {
     quizIndex = 0;
     quizScore = 0;
+    quizResults = [];
     renderQuiz();
 }
